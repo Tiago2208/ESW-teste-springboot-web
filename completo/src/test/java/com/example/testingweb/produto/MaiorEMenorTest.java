@@ -1,5 +1,6 @@
 package com.example.testingweb.produto;
 
+import com.example.testingweb.builders.CarrinhoDeCompraBuilder;
 import com.example.testingweb.carrinho.CarrinhoDeCompra;
 import com.example.testingweb.carrinho.ItemDoCarrinho;
 
@@ -21,20 +22,57 @@ public class MaiorEMenorTest {
 	}
     
     @Test
-    public void deve_verificar_em_ordem_decrescente() {
-        CarrinhoDeCompra carrinho = new CarrinhoDeCompra();
-        carrinho.adicionar(new ItemDoCarrinho(geladeira, UM));
-        carrinho.adicionar(new ItemDoCarrinho(liquidificador, UM));
-        carrinho.adicionar(new ItemDoCarrinho(pratos, UM));
+    public void deve_verificar_em_ordem_decrescente() throws ValorInvalido, CarrinhoVazioException {
+        CarrinhoDeCompra carrinho = new CarrinhoDeCompraBuilder()
+        .comItemDoCarrinho(new ItemDoCarrinho(this.geladeira, UM))
+        .comItemDoCarrinho(new ItemDoCarrinho(this.liquidificador, UM))
+        .comItemDoCarrinho(new ItemDoCarrinho(this.pratos, UM))
+        .construir();
         
         MaiorEMenor algoritmo = new MaiorEMenor();
         algoritmo.encontra(carrinho);
         
-        Assertions.assertEquals("Jogo de pratos", algoritmo.getMenor().getDescricao());
-        Assertions.assertEquals("Geladeira", algoritmo.getMaior().getDescricao());
+        Assertions.assertEquals(pratos, algoritmo.getMenor());
+
+    }
+
+    private CarrinhoDeCompra carrinhoDecrescente() {
+        CarrinhoDeCompra carrinho = new CarrinhoDeCompra();
+        carrinho.adicionar(new ItemDoCarrinho(geladeira, UM));
+        carrinho.adicionar(new ItemDoCarrinho(liquidificador, UM));
+        carrinho.adicionar(new ItemDoCarrinho(pratos, UM));
+        return carrinho;
+    }
+
+    @Test
+    public void deve_verificar_o_maior_em_ordem_decrescente() throws CarrinhoVazioException {
+        CarrinhoDeCompra carrinhoDeCompra = carrinhoDecrescente();
+
+        MaiorEMenor algoritmo = new MaiorEMenor();
+        algoritmo.encontra(carrinhoDeCompra);
+
+        Assertions.assertEquals(geladeira, algoritmo.getMaior());
     }
 
     // outras ordens
     // apenas um produto
     // carrinho sem produto
+
+    @Test
+    public void deve_verificar_o_maior_preco_unitario_em_ordem_crescente() throws ValorInvalido {
+       CarrinhoDeCompra carrinho = new CarrinhoDeCompraBuilder().construir();
+       
+
+    }
+
+    @Test
+    public void deve_lancar_excecao_para_carrinho_sem_produtos() throws Exception {
+        CarrinhoDeCompra carrinhoDeCompra = new CarrinhoDeCompraBuilder().construir();
+        MaiorEMenor maiorEMenor = new MaiorEMenor();
+        Assertions.assertThrows(CarrinhoVazioException.class, ()-> {
+            maiorEMenor.encontra(carrinhoDeCompra);
+        });
+    } 
+
+    
 }
